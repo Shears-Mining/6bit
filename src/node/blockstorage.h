@@ -143,7 +143,11 @@ class BlockManager
 
 private:
     const CChainParams& GetParams() const { return m_opts.chainparams; }
+/* auxpow: GetConsensus() is marked public here for use in the
+   ReadBlockOrHeader template.  */
+public:
     const Consensus::Params& GetConsensus() const { return m_opts.chainparams.GetConsensus(); }
+private:
     /**
      * Load the blocktree off disk and into memory. Populate certain metadata
      * per index entry (nStatus, nChainWork, nTimeMax, etc.) as well as peripheral
@@ -417,6 +421,7 @@ public:
     bool ReadRawBlock(std::vector<std::byte>& block, const FlatFilePos& pos) const;
 
     bool ReadBlockUndo(CBlockUndo& blockundo, const CBlockIndex& index) const;
+    bool ReadBlockHeader(CBlockHeader& block, const CBlockIndex& pindex) const;
 
     void CleanupBlockRevFiles() const;
 };

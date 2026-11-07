@@ -110,6 +110,22 @@ struct Params {
     std::array<BIP9Deployment,MAX_VERSION_BITS_DEPLOYMENTS> vDeployments;
     /** Proof of work parameters */
     uint256 powLimit;
+    /**
+     * Sixbit 2.2.0: "ASERT with Shears StallGuard" from nASERTActivationHeight.
+     *  - step-by-step (relative) ASERT: each block's target follows the previous block's solve time,
+     *    halving/doubling per nASERTHalfLife seconds of difference from nPowTargetSpacing;
+     *  - Shears StallGuard: a block arriving more than nStallGuardDelay seconds after its parent may be
+     *    easier - the target doubles for every full nStallGuardStep seconds beyond the delay;
+     *  - floor: the difficulty never goes below nDifficultyFloorBits (compact target).
+     * The block at the activation height uses nASERTStartBits.
+     */
+    int nASERTActivationHeight{std::numeric_limits<int>::max()};
+    uint32_t nASERTStartBits{0};
+    int64_t nASERTHalfLife{30 * 60};
+    int64_t nStallGuardDelay{3 * 60 * 60};
+    int64_t nStallGuardStep{30 * 60};
+    uint32_t nDifficultyFloorBits{0};
+    bool IsASERTActive(int height) const { return height >= nASERTActivationHeight; }
     bool fPowAllowMinDifficultyBlocks;
     /**
       * Enforce BIP94 timewarp attack mitigation. On testnet4 this also enforces
@@ -152,6 +168,26 @@ struct Params {
         } // no default case, so the compiler can warn about missing cases
         return std::numeric_limits<int>::max();
     }
+
+    /** Auxpow parameters (Sixbit 2.2.0: merge-mining from nAuxpowStartHeight) */
+    int32_t nAuxpowChainId{0};
+    int nAuxpowStartHeight{std::numeric_limits<int>::max()};
+    bool fStrictChainId{true};
+    int nLegacyBlocksBefore{-1}; // -1 for "always allow"
+    bool IsAuxpowActive(int height) const { return height >= nAuxpowStartHeight; }
+
+    /**
+     * Check whether or not to allow legacy blocks at the given height.
+     * @param nHeight Height of the block to check.
+     * @return True if it is allowed to have a legacy version.
+     */
+    bool AllowLegacyBlocks(unsigned nHeight) const
+    {
+        if (nLegacyBlocksBefore < 0)
+            return true;
+        return static_cast<int> (nHeight) < nLegacyBlocksBefore;
+    }
+
 };
 
 } // namespace Consensus

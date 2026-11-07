@@ -5,9 +5,12 @@
 // file COPYING or https://opensource.org/license/mit/.
 
 #include <chain.h>
+#include <node/blockstorage.h>
 #include <tinyformat.h>
 #include <util/time.h>
 
+/* Moved here from the header, because we need auxpow and the logic
+   becomes more involved.  */
 std::string CBlockFileInfo::ToString() const
 {
     return strprintf("CBlockFileInfo(blocks=%u, size=%u, heights=%u...%u, time=%s...%s)", nBlocks, nSize, nHeightFirst, nHeightLast, FormatISO8601Date(nTimeFirst), FormatISO8601Date(nTimeLast));

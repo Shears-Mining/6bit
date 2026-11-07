@@ -144,6 +144,8 @@ public:
         std::unordered_map<Consensus::BuriedDeployment, int> activation_heights{};
         bool fastprune{false};
         bool enforce_bip94{false};
+        int stallguard_height{-1}; //!< Sixbit 2.2.0: -testactivationheight=stallguard@N
+        int auxpow_height{-1};     //!< Sixbit 2.2.0: -testactivationheight=auxpow@N
     };
 
     static std::unique_ptr<const CChainParams> RegTest(const RegTestOptions& options);

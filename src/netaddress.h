@@ -22,7 +22,7 @@
 
 /**
  * A network type.
- * @note An address may belong to more than one network, for example `1.0.0.1`
+ * @note An address may belong to more than one network, for example `127.0.0.1`
  * belongs to both `NET_UNROUTABLE` and `NET_IPV4`.
  * Keep these sequential starting from 0 and `NET_MAX` as the last entry.
  * We have loops like `for (int i = 0; i < NET_MAX; ++i)` that expect to iterate

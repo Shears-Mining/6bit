@@ -22,7 +22,9 @@ constexpr size_t REDOWNLOAD_BUFFER_SIZE{15009}; // 15009/632 = ~23.7 commitments
 
 // Our memory analysis assumes 48 bytes for a CompressedHeader (so we should
 // re-calculate parameters if we compress further)
-static_assert(sizeof(CompressedHeader) == 48);
+//
+// This is not correct for auxpow (with the extra auxpow field).
+//static_assert(sizeof(CompressedHeader) == 48);
 
 HeadersSyncState::HeadersSyncState(NodeId id, const Consensus::Params& consensus_params,
         const CBlockIndex* chain_start, const arith_uint256& minimum_required_work) :
@@ -31,7 +33,7 @@ HeadersSyncState::HeadersSyncState(NodeId id, const Consensus::Params& consensus
     m_chain_start(chain_start),
     m_minimum_required_work(minimum_required_work),
     m_current_chain_work(chain_start->nChainWork),
-    m_last_header_received(m_chain_start->GetBlockHeader()),
+    m_last_header_received(m_chain_start->GetPureHeader()),
     m_current_height(chain_start->nHeight)
 {
     // Estimate the number of blocks that could possibly exist on the peer's
@@ -176,7 +178,7 @@ bool HeadersSyncState::ValidateAndStoreHeadersCommitments(const std::vector<CBlo
     return true;
 }
 
-bool HeadersSyncState::ValidateAndProcessSingleHeader(const CBlockHeader& current)
+bool HeadersSyncState::ValidateAndProcessSingleHeader(const CPureBlockHeader& current)
 {
     Assume(m_download_state == State::PRESYNC);
     if (m_download_state != State::PRESYNC) return false;

@@ -9,7 +9,7 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 70016;
+static const int PROTOCOL_VERSION = 70017;   // Sixbit 2.2: AuxPoW-capable nodes
 
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
@@ -19,6 +19,9 @@ static const int MIN_PEER_PROTO_VERSION = 31800;
 
 //! BIP 0031, pong message, is enabled for all versions AFTER this one
 static const int BIP0031_VERSION = 60000;
+
+//! Sixbit 2.2: peers from this version understand AuxPoW headers and use a size-based "headers" limit.
+static const int SIZE_HEADERS_LIMIT_VERSION = 70017;
 
 //! "sendheaders" command and announcing blocks with headers starts with this version
 static const int SENDHEADERS_VERSION = 70012;

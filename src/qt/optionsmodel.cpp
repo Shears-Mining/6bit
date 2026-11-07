@@ -28,7 +28,7 @@
 #include <QStringList>
 #include <QVariant>
 
-const char *DEFAULT_GUI_PROXY_HOST = "1.0.0.1";
+const char *DEFAULT_GUI_PROXY_HOST = "127.0.0.1";
 
 static QString GetDefaultProxyAddress();
 

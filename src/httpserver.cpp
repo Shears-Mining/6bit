@@ -224,7 +224,7 @@ static bool ClientAllowed(const CNetAddr& netaddr)
 static bool InitHTTPAllowList()
 {
     rpc_allow_subnets.clear();
-    rpc_allow_subnets.emplace_back(LookupHost("1.0.0.1", false).value(), 8);  // always allow IPv4 local subnet
+    rpc_allow_subnets.emplace_back(LookupHost("127.0.0.1", false).value(), 8);  // always allow IPv4 local subnet
     rpc_allow_subnets.emplace_back(LookupHost("::1", false).value());  // always allow IPv6 localhost
     for (const std::string& strAllow : gArgs.GetArgs("-rpcallowip")) {
         const CSubNet subnet{LookupSubNet(strAllow)};
@@ -370,7 +370,7 @@ static bool HTTPBindAddresses(struct evhttp* http)
     // instead, and log warnings.
     if (gArgs.GetArgs("-rpcallowip").empty() || gArgs.GetArgs("-rpcbind").empty()) { // Default to loopback if not allowing external IPs
         endpoints.emplace_back("::1", http_port);
-        endpoints.emplace_back("1.0.0.1", http_port);
+        endpoints.emplace_back("127.0.0.1", http_port);
         if (!gArgs.GetArgs("-rpcallowip").empty()) {
             LogPrintf("WARNING: option -rpcallowip was specified without -rpcbind; this doesn't usually make sense\n");
         }

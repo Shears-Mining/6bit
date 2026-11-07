@@ -87,6 +87,24 @@ public:
 	consensus.nPowTargetSpacing = 10 * 60;
         consensus.enforce_BIP94 = false;
 
+        // Sixbit 2.2.0 (community release): the chain froze at block 34,082 on 12 Oct 2026 with the
+        // difficulty at 38.8 million after a large miner left. From block 34,083:
+        //  - "ASERT with Shears StallGuard" replaces the 2016-block retarget. The switch-over block
+        //    restarts at difficulty ~1,000,000; never easier than ~100,000 (one 1.2 TH/s Bitaxe
+        //    finds a block about every 6 minutes at the floor).
+        //  - AuxPoW: Sixbit can be merge-mined alongside Bitcoin (chain ID 6006). Ordinary
+        //    (solo) blocks remain valid.
+        consensus.nASERTActivationHeight = 34083;
+        consensus.nASERTStartBits = 0x1a10c6e6;          // difficulty ~1,000,000
+        consensus.nDifficultyFloorBits = 0x1b00a7c5;     // never easier than ~100,000
+        consensus.nASERTHalfLife = 2 * 60 * 60;          // 2 hours
+        consensus.nStallGuardDelay = 2 * 60 * 60;        // StallGuard starts after 2 hours...
+        consensus.nStallGuardStep = 30 * 60;             // ...and halves the difficulty every 30 minutes
+        consensus.nAuxpowChainId = 6006;
+        consensus.nAuxpowStartHeight = 34083;
+        consensus.fStrictChainId = true;
+        consensus.nLegacyBlocksBefore = -1;              // ordinary blocks stay valid
+
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].threshold = 1815;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].period = 2016;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -399,6 +417,18 @@ public:
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.enforce_BIP94 = opts.enforce_bip94;
         consensus.fPowNoRetargeting = true;
+        // Sixbit 2.2.0: ASERT + StallGuard and AuxPoW are off on regtest unless switched on with
+        // -testactivationheight=stallguard@N / auxpow@N (for the release tests)
+        consensus.nASERTActivationHeight = opts.stallguard_height >= 0 ? opts.stallguard_height : std::numeric_limits<int>::max();
+        consensus.nASERTStartBits = 0x207fffff;
+        consensus.nDifficultyFloorBits = 0x207fffff;
+        consensus.nASERTHalfLife = 2 * 60 * 60;
+        consensus.nStallGuardDelay = 2 * 60 * 60;
+        consensus.nStallGuardStep = 30 * 60;
+        consensus.nAuxpowChainId = 6006;
+        consensus.nAuxpowStartHeight = opts.auxpow_height >= 0 ? opts.auxpow_height : std::numeric_limits<int>::max();
+        consensus.fStrictChainId = true;
+        consensus.nLegacyBlocksBefore = -1;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].threshold = 108;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].period = 144;

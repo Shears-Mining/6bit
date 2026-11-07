@@ -61,6 +61,7 @@ public:
     std::string authUser;
     std::string peerAddr;
     std::any context;
+    std::any context2; //!< auxpow: a node context next to a wallet context
     JSONRPCVersion m_json_version = JSONRPCVersion::V1_LEGACY;
 
     void parse(const UniValue& valRequest);

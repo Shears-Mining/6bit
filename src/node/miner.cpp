@@ -57,8 +57,8 @@ int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParam
         pblock->nTime = nNewTime;
     }
 
-    // Updating time can change work required on testnet:
-    if (consensusParams.fPowAllowMinDifficultyBlocks) {
+    // Updating time can change work required on testnet, and with Shears StallGuard:
+    if (consensusParams.fPowAllowMinDifficultyBlocks || consensusParams.IsASERTActive(pindexPrev->nHeight + 1)) {
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams);
     }
 
@@ -137,11 +137,24 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
 
-    pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+    // Sixbit 2.2.0: before merge-mining starts, blocks keep the old version bits;
+    // from nAuxpowStartHeight they carry Sixbit's AuxPoW chain ID.
+    const bool auxpow_era{chainparams.GetConsensus().IsAuxpowActive(nHeight)};
+    const int32_t nChainId = chainparams.GetConsensus ().nAuxpowChainId;
+    if (auxpow_era) {
+        pblock->SetBaseVersion(4, nChainId);
+    } else {
+        pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+    }
+
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
     if (chainparams.MineBlocksOnDemand()) {
-        pblock->nVersion = gArgs.GetIntArg("-blockversion", pblock->nVersion);
+        if (auxpow_era) {
+            pblock->SetBaseVersion(gArgs.GetIntArg("-blockversion", pblock->GetBaseVersion()), nChainId);
+        } else {
+            pblock->nVersion = gArgs.GetIntArg("-blockversion", pblock->nVersion);
+        }
     }
 
     pblock->nTime = TicksSinceEpoch<std::chrono::seconds>(NodeClock::now());

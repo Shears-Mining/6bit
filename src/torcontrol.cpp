@@ -49,7 +49,7 @@ using util::SplitString;
 using util::ToString;
 
 /** Default control ip and port */
-const std::string DEFAULT_TOR_CONTROL = "1.0.0.1:" + ToString(DEFAULT_TOR_CONTROL_PORT);
+const std::string DEFAULT_TOR_CONTROL = "127.0.0.1:" + ToString(DEFAULT_TOR_CONTROL_PORT);
 /** Tor cookie size (from control-spec.txt) */
 static const int TOR_COOKIE_SIZE = 32;
 /** Size of client/server nonce for SAFECOOKIE */
@@ -373,7 +373,7 @@ void TorController::get_socks_cb(TorControlConnection& _conn, const TorControlRe
                         if (portstr.empty()) continue;
                     }
                     socks_location = portstr;
-                    if (portstr.starts_with("1.0.0.1:")) {
+                    if (portstr.starts_with("127.0.0.1:")) {
                         // Prefer localhost - ignore other ports
                         break;
                     }
@@ -398,7 +398,7 @@ void TorController::get_socks_cb(TorControlConnection& _conn, const TorControlRe
     }
     if (!resolved.IsValid()) {
         // Fallback to old behaviour
-        resolved = LookupNumeric("1.0.0.1", DEFAULT_TOR_SOCKS_PORT);
+        resolved = LookupNumeric("127.0.0.1", DEFAULT_TOR_SOCKS_PORT);
     }
 
     Assume(resolved.IsValid());

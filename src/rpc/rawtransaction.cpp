@@ -3,12 +3,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or https://opensource.org/license/mit/.
 
+#include <rpc/rawtransaction.h>
+
 #include <base58.h>
 #include <chain.h>
 #include <coins.h>
 #include <consensus/amount.h>
 #include <consensus/validation.h>
-#include <core_io.h>
 #include <index/txindex.h>
 #include <key_io.h>
 #include <node/blockstorage.h>
@@ -55,9 +56,9 @@ using node::PSBTAnalysis;
 
 static constexpr decltype(CTransaction::version) DEFAULT_RAWTX_VERSION{CTransaction::CURRENT_VERSION};
 
-static void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry,
-                     Chainstate& active_chainstate, const CTxUndo* txundo = nullptr,
-                     TxVerbosity verbosity = TxVerbosity::SHOW_DETAILS)
+void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry,
+              Chainstate& active_chainstate, const CTxUndo* txundo,
+              TxVerbosity verbosity)
 {
     CHECK_NONFATAL(verbosity >= TxVerbosity::SHOW_DETAILS);
     // Call into TxToUniv() in sixbit-common to decode the transaction hex.
