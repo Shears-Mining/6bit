@@ -122,7 +122,9 @@ public:
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
 
-        pchMessageStart = {0xd8, 0xa6, 0x3f, 0xc1};
+        // Sixbit 2.2.1: own network ID, so 2.2.x nodes never connect to old-rules (2.1.x) nodes.
+        // Old value (2.2.0 and earlier): {0xd8, 0xa6, 0x3f, 0xc1}
+        pchMessageStart = {0xe6, 0xb1, 0x7e, 0xd2};
         nDefaultPort = 16666;
 
         nPruneAfterHeight = 100000;
@@ -144,8 +146,9 @@ public:
 	assert(consensus.hashGenesisBlock == uint256{"00000000bac112db0b743802429cb6ab05bd0764c373b71f9a9bf4e4d52ed95d"});
 	assert(genesis.hashMerkleRoot == uint256{"648e41dace818a6df5d59dec76d66b62c3f21b5679f29df80d0a004bf68ce191"});
 
-	vSeeds.emplace_back("seed1.6bit.dev");
-	vSeeds.emplace_back("seed2.6bit.dev");
+	// The old seed1/seed2.6bit.dev seeds are gone; Shears Mining public node instead.
+	vSeeds.emplace_back("stratum.shears.co.uk");
+	vFixedSeeds = std::vector<uint8_t>(std::begin(chainparams_seed_main), std::end(chainparams_seed_main));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 28);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 88);

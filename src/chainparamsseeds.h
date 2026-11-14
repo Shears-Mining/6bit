@@ -7,6 +7,8 @@
  * Each line contains a BIP155 serialized (networkID, addr, port) tuple.
  */
 
-static const uint8_t chainparams_seed_main[] = {};
+static const uint8_t chainparams_seed_main[] = {
+    0x01,0x04,0x39,0x81,0xb4,0x45,0x41,0x1a, // 57.129.180.69:16666 (stratum.shears.co.uk)
+};
 
 #endif // SIXBIT_CHAINPARAMSSEEDS_H
