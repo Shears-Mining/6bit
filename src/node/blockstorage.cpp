@@ -1091,7 +1091,7 @@ bool BlockManager::ReadRawBlock(std::vector<std::byte>& block, const FlatFilePos
 
         filein >> blk_start >> blk_size;
 
-        if (blk_start != GetParams().MessageStart()) {
+        if (!GetParams().IsOwnMessageStart(blk_start)) {
             LogError("Block magic mismatch for %s: %s versus expected %s while reading raw block",
                 pos.ToString(), HexStr(blk_start), HexStr(GetParams().MessageStart()));
             return false;

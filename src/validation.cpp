@@ -5136,10 +5136,20 @@ void ChainstateManager::LoadExternalBlockFile(
             try {
                 // locate a header
                 MessageStartChars buf;
-                blkdat.FindByte(std::byte(params.MessageStart()[0]));
+                const auto& legacy_magic{params.LegacyMessageStart()};
+                if (legacy_magic) {
+                    // Sixbit: blk files from before 2.2.1 carry the old magic, so look for either.
+                    uint8_t b{0};
+                    do {
+                        blkdat >> b;
+                    } while (b != params.MessageStart()[0] && b != (*legacy_magic)[0]);
+                    blkdat.SetPos(blkdat.GetPos() - 1);
+                } else {
+                    blkdat.FindByte(std::byte(params.MessageStart()[0]));
+                }
                 nRewind = blkdat.GetPos() + 1;
                 blkdat >> buf;
-                if (buf != params.MessageStart()) {
+                if (!params.IsOwnMessageStart(buf)) {
                     continue;
                 }
                 // read size

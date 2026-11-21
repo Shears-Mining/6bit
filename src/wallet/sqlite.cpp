@@ -197,8 +197,22 @@ bool SQLiteDatabase::Verify(bilingual_str& error)
     uint32_t app_id = static_cast<uint32_t>(read_result.value());
     uint32_t net_magic = ReadBE32(Params().MessageStart().data());
     if (app_id != net_magic) {
-        error = strprintf(_("SQLiteDatabase: Unexpected application id. Expected %u, got %u"), net_magic, app_id);
-        return false;
+        const auto& legacy_magic{Params().LegacyMessageStart()};
+        if (legacy_magic && app_id == ReadBE32(legacy_magic->data())) {
+            // Sixbit 2.2.1 changed the network magic. Wallets made by 2.2.0 and earlier carry the
+            // old value as their application id: restamp them once so they load as normal.
+            LogPrintf("SQLiteDatabase: %s has the pre-2.2.1 Sixbit application id, updating it\n", m_file_path);
+            try {
+                SetPragma(m_db, "application_id", strprintf("%d", static_cast<int32_t>(net_magic)),
+                          "Failed to update the application id");
+            } catch (const std::runtime_error& e) {
+                error = Untranslated(e.what());
+                return false;
+            }
+        } else {
+            error = strprintf(_("SQLiteDatabase: Unexpected application id. Expected %u, got %u"), net_magic, app_id);
+            return false;
+        }
     }
 
     // Check our schema version

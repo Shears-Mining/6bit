@@ -81,6 +81,14 @@ public:
 
     const Consensus::Params& GetConsensus() const { return consensus; }
     const MessageStartChars& MessageStart() const { return pchMessageStart; }
+    /** Sixbit: the network magic used before 2.2.1. Still accepted in files on disk
+     *  (block files, peers.dat, anchors.dat, wallets) so an upgrade is a drop-in swap. */
+    const std::optional<MessageStartChars>& LegacyMessageStart() const { return m_legacy_message_start; }
+    /** True for our current magic, or for the pre-2.2.1 magic when reading old files. */
+    bool IsOwnMessageStart(const MessageStartChars& m) const
+    {
+        return m == pchMessageStart || (m_legacy_message_start && m == *m_legacy_message_start);
+    }
     uint16_t GetDefaultPort() const { return nDefaultPort; }
     std::vector<int> GetAvailableSnapshotHeights() const;
 
@@ -159,6 +167,7 @@ protected:
 
     Consensus::Params consensus;
     MessageStartChars pchMessageStart;
+    std::optional<MessageStartChars> m_legacy_message_start;
     uint16_t nDefaultPort;
     uint64_t nPruneAfterHeight;
     uint64_t m_assumed_blockchain_size;

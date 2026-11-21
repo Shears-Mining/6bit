@@ -104,7 +104,7 @@ void DeserializeDB(Stream& stream, Data&& data, bool fCheckSum = true)
     MessageStartChars pchMsgTmp;
     verifier >> pchMsgTmp;
     // ... verify the network matches ours
-    if (pchMsgTmp != Params().MessageStart()) {
+    if (!Params().IsOwnMessageStart(pchMsgTmp)) {
         throw std::runtime_error{"Invalid network magic number"};
     }
 

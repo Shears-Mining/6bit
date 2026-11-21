@@ -147,7 +147,10 @@ bool IsSQLiteFile(const fs::path& path)
     }
 
     // Check the application id matches our network magic
-    return memcmp(Params().MessageStart().data(), app_id, 4) == 0;
+    if (memcmp(Params().MessageStart().data(), app_id, 4) == 0) return true;
+    // Sixbit: wallets made before 2.2.1 carry the old magic; SQLiteDatabase::Verify restamps them.
+    const auto& legacy_magic{Params().LegacyMessageStart()};
+    return legacy_magic && memcmp(legacy_magic->data(), app_id, 4) == 0;
 }
 
 void ReadDatabaseArgs(const ArgsManager& args, DatabaseOptions& options)

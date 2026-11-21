@@ -125,6 +125,9 @@ public:
         // Sixbit 2.2.1: own network ID, so 2.2.x nodes never connect to old-rules (2.1.x) nodes.
         // Old value (2.2.0 and earlier): {0xd8, 0xa6, 0x3f, 0xc1}
         pchMessageStart = {0xe6, 0xb1, 0x7e, 0xd2};
+        // Files written by 2.2.0 and earlier carry the old magic; accept it when reading from disk only
+        // (never on the wire), so existing block files, peers.dat and wallets keep working after upgrade.
+        m_legacy_message_start = MessageStartChars{0xd8, 0xa6, 0x3f, 0xc1};
         nDefaultPort = 16666;
 
         nPruneAfterHeight = 100000;
